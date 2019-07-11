@@ -1,0 +1,6 @@
+/out
+/data
+/.idea
+*.iml
+*.jar
+.DS_Store
