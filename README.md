@@ -8,3 +8,6 @@ Real-time stock tickers from the command-line based on Java
 - Dependencies
   - org.apache.httpcomponents:httpclient:4.5.9
   - org.json:json:20180813
+
+#
+*Inspired by [ticker.sh](https://github.com/pstadler/ticker.sh)*
