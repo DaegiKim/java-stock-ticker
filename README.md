@@ -20,7 +20,7 @@ $ java -jar ./java-stock-ticker.jar 500 ^KS11 ^KQ11 GOOG AAPL BTC-USD 207760.KQ 
 ```
 
 #### Note
-*Data on the US stock market is updated in real time, but most other countries has time delays(10~20min). [link](https://help.yahoo.com/kb/SLN2310.html)*
+*Data on the US stock market is updated in real time, but most other countries has delays(10~20min). [link](https://help.yahoo.com/kb/SLN2310.html)*
 
 #
 *Inspired by [ticker.sh](https://github.com/pstadler/ticker.sh)*
