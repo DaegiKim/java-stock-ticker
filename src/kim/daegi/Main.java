@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class Main {
@@ -43,11 +44,13 @@ public class Main {
 
     private static void print(JSONObject jsonObject) {
         JSONArray result = jsonObject.getJSONObject("quoteResponse").getJSONArray("result");
-//        result = sort(result);
+        result = sort(result);
 
         StringBuilder sb = new StringBuilder();
         sb.append("\033[H\033[2J");
-        sb.append(String.format(ConsoleColors.CYAN_UNDERLINED+"%-15s%10s%10s%11s%10s %-20s\033[0m\n", "Name", "Symbol", "Price", "Diff", "Percent", "Long Name"));
+        sb.append(String.format(ConsoleColors.CYAN_UNDERLINED+"%-15s%10s%10s%11s%10s%15s%12s %-20s\033[0m\n", "Name", "Symbol", "Price", "Diff", "Percent", "Delay", "MarketState", "Long Name"));
+
+        long currentTimeMillis = System.currentTimeMillis();
 
         for (int i = 0; i < result.length(); i++) {
             JSONObject data = result.getJSONObject(i);
@@ -57,6 +60,8 @@ public class Main {
 
             String longName = data.optString("longName", shortName);
             String symbol = data.optString("symbol");
+            String marketState = data.optString("marketState");
+            long regularMarketTime = data.optLong("regularMarketTime");
 
             double regularMarketPrice = data.optDouble("regularMarketPrice");
             double regularMarketDayHigh = data.optDouble("regularMarketDayHigh");
@@ -77,9 +82,18 @@ public class Main {
 
             sb.append(String.format(color+"%11s"+ConsoleColors.RESET, String.format("%.2f", regularMarketChange)+" "+(regularMarketChange>0?"▲":regularMarketChange<0?"▼":"-")));
             sb.append(String.format(color+"%10s"+ConsoleColors.RESET, String.format("(%.2f%%)", regularMarketChangePercent)));
+            sb.append(String.format("%15s", prettyTime(currentTimeMillis-(regularMarketTime*1000))));
+            sb.append(String.format("%12s", marketState));
             sb.append(String.format(" %-20s\n", longName));
         }
         System.out.print(sb);
+    }
+
+    private static String prettyTime(long millis) {
+        return String.format("%dm, %ds",
+                TimeUnit.MILLISECONDS.toMinutes(millis),
+                TimeUnit.MILLISECONDS.toSeconds(millis) -
+                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
     }
 
     private static JSONArray sort(JSONArray result) {
@@ -91,8 +105,8 @@ public class Main {
         }
 
         jsonValues.sort((a, b) -> {
-            double valA = a.getDouble("regularMarketChangePercent");
-            double valB = b.getDouble("regularMarketChangePercent");
+            double valA = a.optDouble("regularMarketChangePercent");
+            double valB = b.optDouble("regularMarketChangePercent");
             return Double.compare(valB, valA);
         });
 
